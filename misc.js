@@ -17,6 +17,7 @@ import CardSubHeader from "../CardSubHeader";
 import "./style.scss";
 import { iconFolder } from "../../constants/ImageConstants";
 import { countriesId } from "../../constants/idCard";
+import FXCMTrans from "../common/FXCMTrans";
 
 const BasicIdentification = ({
   formData,
@@ -27,25 +28,68 @@ const BasicIdentification = ({
   const [COC, setCOC] = useState();
   const [selectedField, setSelectedField] = useState("");
   const [IDNumber, setIDNumber] = useState("");
-  //   const [value, setValue] = useState("");
-  //   const [passportNumber, setPassportNumber] = useState();
-  //   const [identityNumber, setIdentityNumber] = useState();
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const country = countriesId.filter(
+    let country = countriesId.find(
       (countryId) => countryId.country === selectedCountry?.name
     );
-    setCOC(...country);
+    if (!country) {
+      country = {
+        country: "Other",
+        hasMuntipleIDs: false,
+        isRequired: false,
+        fields: [
+          {
+            min: 3,
+            max: 35,
+            isAlphaNumeric: true,
+            symbolsAllowed: false,
+            helpText: "some help text",
+            value: "NATIONAL_PASSPORT_NUMBER",
+          },
+        ],
+      };
+    }
+    setCOC(country);
+    if (!country.hasMuntipleIDs) setSelectedField(country.fields[0].value);
   }, [selectedCountry]);
 
   const handleIDFieldChange = (event) => {
     setSelectedField(event.target.value);
+    setIDNumber("");
   };
 
   const onNextClick = (e) => {
     e.preventDefault();
-    console.log({ [selectedField]: IDNumber });
-    if (parentNext) parentNext();
+    if (errorMessage) {
+      setError(true);
+      return;
+    }
+    if (error === false && !errorMessage && parentNext) parentNext();
+  };
+
+  const isValid = (value, field) => {
+    let { min, max, isAlphaNumeric, symbolsAllowed } = field;
+    const isLengthSatisfied = new RegExp(`^.{${min},${max}}$`).test(value);
+    const isOnlyNumeric = /^\d+$/.test(value);
+    const hasSymbols = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(value);
+
+    if (
+      !isLengthSatisfied ||
+      (isAlphaNumeric === false && isOnlyNumeric === false) ||
+      (symbolsAllowed === false && hasSymbols === true)
+    ) {
+      return false;
+    }
+    return true;
+  };
+
+  const handleIDChange = (value, field) => {
+    setIDNumber(value);
+    if (error) setError(false);
+    setErrorMessage(!isValid(value, field) ? "Does not satisfy input" : "");
   };
 
   const showMuntipleIDsOptions = () => {
@@ -65,7 +109,14 @@ const BasicIdentification = ({
                   fullWidth
                   placeholder={COC.fields[key].helpText}
                   value={IDNumber}
-                  onChange={(e) => setIDNumber(e.target.value)}
+                  onChange={(e) =>
+                    handleIDChange(e.target.value, COC.fields[key])
+                  }
+                  required={COC.isRequired}
+                  error={error ? true : false}
+                  helperText={
+                    error ? <FXCMTrans defaults={errorMessage} /> : ""
+                  }
                 />
               )}
             </>
@@ -80,12 +131,14 @@ const BasicIdentification = ({
       <FormControl fullWidth className="custom-form-controler">
         {formData.fields2.map((item, key) => (
           <TextField
-            required={item.required}
             label={item.label}
             fullWidth
             placeholder={COC?.fields[0].helpText}
             value={IDNumber}
-            onChange={(e) => setIDNumber(e.target.value)}
+            onChange={(e) => handleIDChange(e.target.value, COC.fields[key])}
+            required={COC.isRequired}
+            error={error ? true : false}
+            helperText={error ? <FXCMTrans defaults={errorMessage} /> : ""}
           />
         ))}
       </FormControl>
@@ -126,48 +179,6 @@ const BasicIdentification = ({
 };
 
 export default BasicIdentification;
-
-
-
-
- {
-          "type": "basicIdentification",
-          "cardKey": 2,
-          "headerIcon": "QUESTIONNAIRE_ICON",
-          "header": "PROVIDE_ID",
-          "subHeader": "GOVERNMENT_ID",
-          "skipText": "",
-          "fields1": [
-            {
-              "label": "National ID Number",
-              "value": "NATIONAL_IDENTITY_NUMBER",
-              "required": false,
-              "column": 12,
-              "type": "radio"
-            },
-            {
-              "label": "Passport Number",
-              "value": "PASSPORT_NUMBER",
-              "required": false,
-              "column": 12,
-              "type": "radio"
-            }
-          ],
-          "fields2": [
-            {
-              "label": "NATIONAL PASSPORT",
-              "value": "NATIONAL_PASSPORT_NUMBER",
-              "required": true,
-              "column": 12,
-              "type": "text"
-            }
-          ]
-        }
-
-
-
-
-
 
 
 
@@ -316,7 +327,7 @@ export const countriesId = [
         isAlphaNumeric: true,
         symbolsAllowed: false,
         helpText: "some help text",
-        value: "PASSPORT_NUMBER",
+        value: "NATIONAL_PASSPORT_NUMBER",
       },
     ],
   },
@@ -475,8 +486,8 @@ export const countriesId = [
     hasMuntipleIDs: true,
     fields: [
       {
-        min: 9,
-        max: 9,
+        min: 3,
+        max: 5,
         isAlphaNumeric: false,
         symbolsAllowed: false,
         helpText: "some help text",
@@ -581,6 +592,7 @@ export const countriesId = [
   {
     country: "Estonia",
     hasMuntipleIDs: false,
+    isRequired:true,
     fields: [
       {
         min: 11,
@@ -595,6 +607,7 @@ export const countriesId = [
   {
     country: "Iceland",
     hasMuntipleIDs: false,
+    isRequired:true,
     fields: [
       {
         min: 10,
@@ -609,6 +622,7 @@ export const countriesId = [
   {
     country: "Italy",
     hasMuntipleIDs: false,
+    isRequired:true,
     fields: [
       {
         min: 16,
@@ -623,6 +637,7 @@ export const countriesId = [
   {
     country: "Poland",
     hasMuntipleIDs: true,
+    isRequired:true,
     fields: [
       {
         min: 11,
@@ -645,6 +660,7 @@ export const countriesId = [
   {
     country: "Malta",
     hasMuntipleIDs: true,
+    isRequired:true,
     fields: [
       {
         min: 8,
@@ -667,6 +683,7 @@ export const countriesId = [
   {
     country: "Spain",
     hasMuntipleIDs: false,
+    isRequired:true,
     fields: [
       {
         min: 9,
@@ -679,179 +696,3 @@ export const countriesId = [
     ],
   },
 ];
-
-
-
-
-
-
-
-
-import React, { useRef, useState } from "react";
-import { Typography } from "@mui/material";
-import { useDispatch } from "react-redux";
-
-import { FormProvider } from "react-hook-form";
-import {
-  AboutYourSelf,
-  CountryDropdown,
-  BasicIdentification,
-  SearchAddress,
-  ManualAddress,
-} from "../../../../components/FormCard";
-import FXCMQuestionCard from "../../../../components/FXCMQuestionCard";
-import ContactNumber from "../../../../components/FormCard/ContactNumber";
-import { updateUserInfo } from "../../../../reducers/userInfoSlice";
-
-const SectionComponent = ({
-  sectionData,
-  gotToNextSection,
-  activeSection,
-  sectionName,
-}) => {
-  const dispatch = useDispatch();
-  const [activeStep, setActiveStep] = useState(0);
-  const steps = sectionData.cards;
-  const countryName = useRef(); // new
-  const getStepContent = (step) => {
-    const singleCardData = steps[step];
-    // setSingleCardData(steps[step], "data");
-    switch (singleCardData.type) {
-      case "question":
-        return (
-          <FXCMQuestionCard
-            key={step}
-            questionData={singleCardData}
-            nextClick={handleNext}
-            backClick={handleBack}
-            // sectionKey={sectionKey}
-            // setSectionKey={setSectionKey}
-            //setCardKey={setCardKey}
-          />
-        );
-      case "intro":
-        return (
-          <FXCMQuestionCard
-            key={step}
-            questionData={singleCardData}
-            nextClick={handleNext}
-            backClick={handleBack}
-            // sectionKey={sectionKey}
-            // setSectionKey={setSectionKey}
-          />
-        );
-      case "aboutYourself":
-        return (
-          <AboutYourSelf
-            key={step}
-            formData={singleCardData}
-            nextClick={handleNext}
-          />
-        );
-      case "citizenship":
-        return (
-          <CountryDropdown
-            key={step}
-            formData={singleCardData}
-            nextClick={handleNext}
-          />
-        );
-      case "basicIdentification":
-        return (
-          <BasicIdentification
-            key={step}
-            formData={singleCardData}
-            nextClick={handleNext}
-            selectedCountry={countryName.current} //new
-          />
-        );
-      case "searchAddress":
-        return (
-          <SearchAddress
-            key={step}
-            formData={singleCardData}
-            nextClick={handleNext}
-          />
-        );
-      case "manualAddress":
-        return (
-          <ManualAddress
-            key={step}
-            formData={singleCardData}
-            nextClick={handleNext}
-          />
-        );
-      case "contactnumber":
-        return (
-          <ContactNumber
-            key={step}
-            formData={singleCardData}
-            nextClick={handleNext}
-          />
-        );
-      default:
-        return <div>No data Found</div>;
-    }
-  };
-
-  // const isStepOptional = (step) => {
-  // 	return step === 1 || step === 2;
-  // };
-
-  const handleNext = (singleCardResponse, section, card) => {
-    // console.log(singleCardResponse, section, card);
-    countryName.current = singleCardResponse; //new
-    dispatch(updateUserInfo({ sectionName, card: singleCardResponse }));
-
-    if (singleCardResponse) {
-      console.log(
-        "---------------------Current Card Data---------------------\n\n" +
-          JSON.stringify(singleCardResponse)
-      );
-    }
-
-    if (activeStep === steps.length - 1) {
-      if (singleCardResponse) {
-        //call API if required and go to next step
-        setActiveStep(0);
-        if (gotToNextSection) {
-          gotToNextSection();
-        }
-      } else {
-        setActiveStep(0);
-        if (gotToNextSection) {
-          gotToNextSection();
-        }
-      }
-    } else {
-      //Save data in store and go to next by setting active step
-      if (card >= 0) {
-        if (activeSection === section) {
-          setActiveStep(card);
-        } else {
-          setActiveStep(card);
-          gotToNextSection(section);
-        }
-      } else {
-        setActiveStep(activeStep + 1);
-      }
-    }
-  };
-
-  const handleBack = () => {
-    setActiveStep(activeStep - 1);
-  };
-
-  return (
-    <>
-      {activeStep === steps.length ? (
-        <Typography variant="h3" align="center">
-          Thank You
-        </Typography>
-      ) : (
-        <FormProvider>{getStepContent(activeStep)}</FormProvider>
-      )}
-    </>
-  );
-};
-export default SectionComponent;
