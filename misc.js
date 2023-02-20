@@ -33,7 +33,7 @@ const BasicIdentification = ({
 
   useEffect(() => {
     let country = countriesId.find(
-      (countryId) => countryId.country === selectedCountry?.name
+      (countryId) => countryId.country === selectedCountry
     );
     if (!country) {
       country = {
@@ -48,6 +48,7 @@ const BasicIdentification = ({
             symbolsAllowed: false,
             helpText: "some help text",
             value: "NATIONAL_PASSPORT_NUMBER",
+            errorMsg: "Identity number input is incorrect",
           },
         ],
       };
@@ -59,6 +60,7 @@ const BasicIdentification = ({
   const handleIDFieldChange = (event) => {
     setSelectedField(event.target.value);
     setIDNumber("");
+    setError(false);
   };
 
   const onNextClick = (e) => {
@@ -89,7 +91,11 @@ const BasicIdentification = ({
   const handleIDChange = (value, field) => {
     setIDNumber(value);
     if (error) setError(false);
-    setErrorMessage(!isValid(value, field) ? "Does not satisfy input" : "");
+    if (value) {
+      setErrorMessage(!isValid(value, field) ? field?.errorMsg : "");
+    } else {
+      setErrorMessage("");
+    }
   };
 
   const showMuntipleIDsOptions = () => {
@@ -97,29 +103,40 @@ const BasicIdentification = ({
       <FormControl>
         <RadioGroup value={selectedField} onChange={handleIDFieldChange}>
           {formData.fields1.map((item, key) => (
-            <>
+            <div
+              className={
+                selectedField === item.value
+                  ? "selected-radio-button"
+                  : "radio-button"
+              }
+            >
               <FormControlLabel
                 value={COC.fields[key].value}
-                control={<Radio />}
-                label={item.label}
+                control={<Radio required={COC?.isRequired} />}
+                label={<Typography>{item.label}</Typography>}
                 labelPlacement="start"
               />
               {selectedField === item.value && (
                 <TextField
+                  className="id-card-input"
                   fullWidth
                   placeholder={COC.fields[key].helpText}
                   value={IDNumber}
                   onChange={(e) =>
                     handleIDChange(e.target.value, COC.fields[key])
                   }
-                  required={COC.isRequired}
+                  required={COC?.isRequired}
                   error={error ? true : false}
                   helperText={
                     error ? <FXCMTrans defaults={errorMessage} /> : ""
                   }
+                  variant="standard"
+                  InputProps={{
+                    disableUnderline: true,
+                  }}
                 />
               )}
-            </>
+            </div>
           ))}
         </RadioGroup>
       </FormControl>
@@ -136,7 +153,7 @@ const BasicIdentification = ({
             placeholder={COC?.fields[0].helpText}
             value={IDNumber}
             onChange={(e) => handleIDChange(e.target.value, COC.fields[key])}
-            required={COC.isRequired}
+            required={COC?.isRequired}
             error={error ? true : false}
             helperText={error ? <FXCMTrans defaults={errorMessage} /> : ""}
           />
@@ -154,15 +171,16 @@ const BasicIdentification = ({
           <CardSubHeader value={getLabel(formData.subHeader)} />
         )}
 
-        <Box display="flex" justifyContent="center" mt={5}>
+        <Box mt={5}>
           <form onSubmit={onNextClick}>
-            <Grid container spacing={1}>
+            <Container mt={10} mb={10} maxWidth="sm" className="id-card-number">
               {COC?.hasMuntipleIDs
                 ? showMuntipleIDsOptions()
                 : showOneIDOption()}
               <Grid item md={12} xs={12}>
                 <Button
                   //   disabled={!passportNumber && !identityNumber}
+                  disabled={COC?.isRequired || IDNumber}
                   sx={{ m: 3 }}
                   type="submit"
                   variant="contained"
@@ -170,7 +188,16 @@ const BasicIdentification = ({
                   {getLabel("NEXT")}
                 </Button>
               </Grid>
-            </Grid>
+              <Grid item>
+                <Button
+                  variant="text"
+                  onClick={onNextClick}
+                  disabled={COC?.isRequired || IDNumber}
+                >
+                  {getLabel("SKIP")}
+                </Button>
+              </Grid>
+            </Container>
           </form>
         </Box>
       </Container>
@@ -179,6 +206,105 @@ const BasicIdentification = ({
 };
 
 export default BasicIdentification;
+
+
+
+
+
+
+
+
+//id number card
+.id-card-number {
+  .MuiFormControl-fullWidth {
+    width: 448px;
+    height: 40px;
+  }
+  .MuiFormGroup-root {
+    gap: 8px;
+
+    .radio-button {
+      display: flex;
+      padding: 16px;
+      gap: 8px;
+      width: 448px;
+      height: 56px;
+      border-radius: 90px;
+      box-sizing: border-box;
+      background: #f3f3f3;
+      label {
+        gap: 8px;
+        span {
+          height: 20px;
+          width: 20px;
+          span {
+            color: #d3d3d3;
+          }
+        }
+      }
+      p {
+        width: 356px;
+        height: 20px;
+        font-family: "Noto Sans";
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.03em;
+        color: rgba(0, 0, 0, 0.6);
+        display: flex;
+      }
+    }
+    .selected-radio-button {
+      width: 448px;
+      box-sizing: border-box;
+      height: 116px;
+      background: #0071eb;
+      border: 1px solid #0071eb;
+      border-radius: 16px;
+      label {
+        height: 56px;
+        span.Mui-checked {
+          background: #ffffff;
+          border: 1px solid #d3d3d3;
+          height: 20px;
+          width: 20px;
+        }
+        p {
+          display: flex;
+          height: 20px;
+          width: 360px;
+          color: #ffffff;
+        }
+      }
+      .id-card-input {
+        width: 416px;
+        height: 44px;
+        background: #ffffff;
+        border: 1px solid #d3d3d3;
+        border-radius: 4px;
+        box-sizing: border-box;
+        input {
+          padding: 10px 5px;
+        }
+        p {
+          top: 10px;
+          position: relative;
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -263,7 +389,7 @@ export const countriesId = [
         isAlphaNumeric: true,
         symbolsAllowed: false,
         helpText: "some help text",
-        value: "PASSPORT_NUMBER",
+        value: "NATIONAL_IDENTITY_NUMBER",
       },
       {
         min: 8,
@@ -328,6 +454,7 @@ export const countriesId = [
         symbolsAllowed: false,
         helpText: "some help text",
         value: "NATIONAL_PASSPORT_NUMBER",
+        errorMsg: "Identity number input is incorrect",
       },
     ],
   },
@@ -397,7 +524,7 @@ export const countriesId = [
         isAlphaNumeric: true,
         symbolsAllowed: false,
         helpText: "some help text",
-        value: "PASSPORT_NUMBER",
+        value: "NATIONAL_IDENTITY_NUMBER",
       },
       {
         min: 6,
@@ -419,7 +546,8 @@ export const countriesId = [
         isAlphaNumeric: false,
         symbolsAllowed: false,
         helpText: "some help text",
-        value: "PASSPORT_NUMBER",
+        value: "NATIONAL_IDENTITY_NUMBER",
+        errorMsg:"error"
       },
       {
         min: 8,
@@ -428,6 +556,7 @@ export const countriesId = [
         symbolsAllowed: false,
         helpText: "some help text",
         value: "PASSPORT_NUMBER",
+        errorMsg:"error"
       },
     ],
   },
@@ -455,7 +584,7 @@ export const countriesId = [
         isAlphaNumeric: true,
         symbolsAllowed: false,
         helpText: "some help text",
-        value: "PASSPORT_NUMBER",
+        value: "NATIONAL_IDENTITY_NUMBER",
       },
       {
         min: 9,
@@ -486,12 +615,13 @@ export const countriesId = [
     hasMuntipleIDs: true,
     fields: [
       {
-        min: 3,
-        max: 5,
+        min: 9,
+        max: 9,
         isAlphaNumeric: false,
         symbolsAllowed: false,
         helpText: "some help text",
         value: "NATIONAL_IDENTITY_NUMBER",
+        errorMsg: "Identity number does not satisy",
       },
       {
         min: 7,
@@ -500,6 +630,7 @@ export const countriesId = [
         symbolsAllowed: false,
         helpText: "some help text",
         value: "PASSPORT_NUMBER",
+        errorMsg: "passport number does not satisy",
       },
     ],
   },
@@ -513,7 +644,7 @@ export const countriesId = [
         isAlphaNumeric: false,
         symbolsAllowed: false,
         helpText: "some help text",
-        value: "PASSPORT_NUMBER",
+        value: "NATIONAL_IDENTITY_NUMBER",
       },
       {
         min: 8,
@@ -535,7 +666,7 @@ export const countriesId = [
         isAlphaNumeric: false,
         symbolsAllowed: false,
         helpText: "some help text",
-        value: "PASSPORT_NUMBER",
+        value: "NATIONAL_IDENTITY_NUMBER",
       },
       {
         min: 9,
@@ -592,7 +723,7 @@ export const countriesId = [
   {
     country: "Estonia",
     hasMuntipleIDs: false,
-    isRequired:true,
+    isRequired: true,
     fields: [
       {
         min: 11,
@@ -607,7 +738,7 @@ export const countriesId = [
   {
     country: "Iceland",
     hasMuntipleIDs: false,
-    isRequired:true,
+    isRequired: true,
     fields: [
       {
         min: 10,
@@ -622,7 +753,7 @@ export const countriesId = [
   {
     country: "Italy",
     hasMuntipleIDs: false,
-    isRequired:true,
+    isRequired: true,
     fields: [
       {
         min: 16,
@@ -637,7 +768,7 @@ export const countriesId = [
   {
     country: "Poland",
     hasMuntipleIDs: true,
-    isRequired:true,
+    isRequired: true,
     fields: [
       {
         min: 11,
@@ -645,7 +776,7 @@ export const countriesId = [
         isAlphaNumeric: false,
         symbolsAllowed: false,
         helpText: "some help text",
-        value: "PASSPORT_NUMBER",
+        value: "NATIONAL_IDENTITY_NUMBER",
       },
       {
         min: 10,
@@ -660,7 +791,7 @@ export const countriesId = [
   {
     country: "Malta",
     hasMuntipleIDs: true,
-    isRequired:true,
+    isRequired: true,
     fields: [
       {
         min: 8,
@@ -668,7 +799,7 @@ export const countriesId = [
         isAlphaNumeric: true,
         symbolsAllowed: false,
         helpText: "some help text",
-        value: "PASSPORT_NUMBER",
+        value: "NATIONAL_IDENTITY_NUMBER",
       },
       {
         min: 7,
@@ -683,7 +814,7 @@ export const countriesId = [
   {
     country: "Spain",
     hasMuntipleIDs: false,
-    isRequired:true,
+    isRequired: true,
     fields: [
       {
         min: 9,
