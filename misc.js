@@ -1,296 +1,404 @@
-import {
-  FormControl,
-  Box,
-  Container,
-  TextField,
-  Grid,
+  {
+      "type": "searchAddress",
+      "cardKey": 0,
+      "headerIcon": "home.png",
+      "header": "WHERE_DO_YOU_LIVE",
+      "subHeader": "WHERE_DO_YOU_LIVE_SUBHEADER",
+      "inputLabel": "SEARCH_ADDRESS",
+      "TextManual": "ENTER_MANUALLY",
+      "skipText": "",
+      "fields": [
+        {
+          "label": "Unit/flat# (optional)",
+          "value": "flat_no",
+          "required": false,
+          "column": 6,
+          "type": "text"
+        },
+        {
+          "label": "Building/Street Number",
+          "value": "street_no",
+          "required": false,
+          "column": 6,
+          "type": "text"
+        },
+        {
+          "label": "Street name",
+          "value": "street",
+          "required": false,
+          "column": 6,
+          "type": "text"
+        },
+        {
+          "label": "City / Town",
+          "value": "city",
+          "required": false,
+          "column": 6,
+          "type": "text"
+        },
+        {
+          "label": "Province",
+          "value": "province",
+          "required": false,
+          "column": 7,
+          "type": "text"
+        },
+        {
+          "label": "Postcode",
+          "value": "postal_code",
+          "required": false,
+          "column": 5,
+          "type": "text"
+        }
+      ]
+    },
+      
+      
+      
+      
+      
+      
+      
+      import {
   Button,
+  Container,
   Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
+  Box,
+  Grid,
+  FormControl,
+  TextField,
+  Divider,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import CardHeader from "../CardHeader";
-import CardSubHeader from "../CardSubHeader";
+import CardHeader from "../../../CardHeader";
+import CardSubHeader from "../../../CardSubHeader";
+import FXCMAddressDropdown from "../../../common/FXCMLoqateSearchBar";
 import "./style.scss";
-import { iconFolder } from "../../constants/ImageConstants";
-import { countriesId } from "../../constants/idCard";
-import FXCMTrans from "../common/FXCMTrans";
+import { imageFolder } from "../../../../constants/ImageConstants";
+import { restrictedCountriesURL } from "../../../../constants/configurationServices";
+import FXCMTrans from "../../../common/FXCMTrans";
 
-const BasicIdentification = ({
-  formData,
-  nextClick: parentNext,
-  selectedCountry,
-}) => {
+const SearchAddress = ({ formData, nextClick: parentNext }) => {
   const { t: getLabel } = useTranslation();
-  const [COC, setCOC] = useState();
-  const [selectedField, setSelectedField] = useState("");
-  const [IDNumber, setIDNumber] = useState("");
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [loqateService, setLoqateService] = useState(true);
+  const [isManual, setIsManual] = useState(false);
+  const [restrictedLoqate, setRestrictedLoqate] = useState();
+  const [provinceRestricted, setProvinceRestricted] = useState();
+  const [errorFeild, setErrorFeild] = useState([]);
+  const COR = useSelector((state) => state.user.user.countryOfResidence);
+
+  const fetchLoqateRestrictedcountries = () => {
+    fetch(restrictedCountriesURL)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setRestrictedLoqate(data.loqateRestricted);
+        setProvinceRestricted(data.provinceRestricted);
+      })
+      .catch((e) => {
+        console.log(e.message);
+      });
+  };
 
   useEffect(() => {
-    let country = countriesId.find(
-      (countryId) => countryId.country === selectedCountry
-    );
-    if (!country) {
-      country = {
-        country: "Other",
-        hasMuntipleIDs: false,
-        isRequired: false,
-        fields: [
-          {
-            min: 3,
-            max: 35,
-            isAlphaNumeric: true,
-            symbolsAllowed: false,
-            helpText: "some help text",
-            value: "NATIONAL_PASSPORT_NUMBER",
-            errorMsg: "Identity number input is incorrect",
-          },
-        ],
-      };
-    }
-    setCOC(country);
-    if (!country.hasMuntipleIDs) setSelectedField(country.fields[0].value);
-  }, [selectedCountry]);
+    fetchLoqateRestrictedcountries();
+  }, []);
 
-  const handleIDFieldChange = (event) => {
-    setSelectedField(event.target.value);
-    setIDNumber("");
-    setError(false);
+  useEffect(() => {
+    if (restrictedLoqate?.includes(COR)) {
+      setLoqateService(false);
+      setIsManual(true);
+    }
+  }, [restrictedLoqate, COR]);
+
+  const showManualAddressFeilds = () => {
+    setIsManual(true);
   };
 
   const onNextClick = (e) => {
     e.preventDefault();
-    if (errorMessage) {
-      setError(true);
-      return;
+    const form = e.target;
+    const formData = new FormData(form);
+    const formJson = Object.fromEntries(formData.entries());
+    const errorFeilds = [];
+    for (let key in formJson) {
+      if (formJson[key] === "" && key !== "flat_no") errorFeilds.push(key);
     }
-    if (error === false && !errorMessage && parentNext) parentNext();
-  };
-
-  const isValid = (value, field) => {
-    let { min, max, isAlphaNumeric, symbolsAllowed } = field;
-    const isLengthSatisfied = new RegExp(`^.{${min},${max}}$`).test(value);
-    const isOnlyNumeric = /^\d+$/.test(value);
-    const hasSymbols = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(value);
-
-    if (
-      !isLengthSatisfied ||
-      (isAlphaNumeric === false && isOnlyNumeric === false) ||
-      (symbolsAllowed === false && hasSymbols === true)
-    ) {
-      return false;
-    }
-    return true;
-  };
-
-  const handleIDChange = (value, field) => {
-    setIDNumber(value);
-    if (error) setError(false);
-    if (value) {
-      setErrorMessage(!isValid(value, field) ? field?.errorMsg : "");
-    } else {
-      setErrorMessage("");
+    setErrorFeild(errorFeilds);
+    if (parentNext && !errorFeilds.length) {
+      parentNext();
+      console.log(formJson);
     }
   };
 
-  const showMuntipleIDsOptions = () => {
-    return (
-      <FormControl>
-        <RadioGroup value={selectedField} onChange={handleIDFieldChange}>
-          {formData.fields1.map((item, key) => (
-            <div
-              className={
-                selectedField === item.value
-                  ? "selected-radio-button"
-                  : "radio-button"
-              }
-            >
-              <FormControlLabel
-                value={COC.fields[key].value}
-                control={<Radio required={COC?.isRequired} />}
-                label={<Typography>{item.label}</Typography>}
-                labelPlacement="start"
-              />
-              {selectedField === item.value && (
-                <TextField
-                  className="id-card-input"
-                  fullWidth
-                  placeholder={COC.fields[key].helpText}
-                  value={IDNumber}
-                  onChange={(e) =>
-                    handleIDChange(e.target.value, COC.fields[key])
-                  }
-                  required={COC?.isRequired}
-                  error={error ? true : false}
-                  helperText={
-                    error ? <FXCMTrans defaults={errorMessage} /> : ""
-                  }
-                  variant="standard"
-                  InputProps={{
-                    disableUnderline: true,
-                  }}
-                />
-              )}
-            </div>
-          ))}
-        </RadioGroup>
+  const getFeildSize = (item) => {
+    if (!provinceRestricted?.includes(COR)) {
+      if (item.value === "street") return 12;
+      if (item.value === "city") return 7;
+    }
+    return item.column;
+  };
+
+  const showFeild = (item) => (
+    <Grid item md={getFeildSize(item)} key={item.value}>
+      <FormControl className="custom-form-controler address-feild" fullWidth>
+        <TextField
+          required={item.required}
+          placeholder={getLabel(item.label)}
+          type={item.type}
+          variant="outlined"
+          id={item.value}
+          name={item.value}
+          onChange={() => {
+            if (errorFeild.length) setErrorFeild([]);
+          }}
+          error={errorFeild.includes(item.value)}
+          helperText={
+            errorFeild.includes(item.value) ? (
+              <FXCMTrans defaults={getLabel("MANDATORY_CHECK")} />
+            ) : (
+              ""
+            )
+          }
+        />
       </FormControl>
-    );
-  };
-
-  const showOneIDOption = () => {
-    return (
-      <FormControl fullWidth className="custom-form-controler">
-        {formData.fields2.map((item, key) => (
-          <TextField
-            label={item.label}
-            fullWidth
-            placeholder={COC?.fields[0].helpText}
-            value={IDNumber}
-            onChange={(e) => handleIDChange(e.target.value, COC.fields[key])}
-            required={COC?.isRequired}
-            error={error ? true : false}
-            helperText={error ? <FXCMTrans defaults={errorMessage} /> : ""}
-          />
-        ))}
-      </FormControl>
-    );
-  };
-
-  return (
-    <Box align="center" mb={6} mt={2}>
-      <Container mt={10} mb={10} maxWidth="md">
-        <img src={iconFolder + formData.headerIcon + ".svg"} alt="Icon" />
-        <CardHeader title={getLabel(formData.header)} />
-        {formData.subHeader && (
-          <CardSubHeader value={getLabel(formData.subHeader)} />
-        )}
-
-        <Box mt={5}>
-          <form onSubmit={onNextClick}>
-            <Container mt={10} mb={10} maxWidth="sm" className="id-card-number">
-              {COC?.hasMuntipleIDs
-                ? showMuntipleIDsOptions()
-                : showOneIDOption()}
-              <Grid item md={12} xs={12}>
-                <Button
-                  //   disabled={!passportNumber && !identityNumber}
-                  disabled={COC?.isRequired || IDNumber}
-                  sx={{ m: 3 }}
-                  type="submit"
-                  variant="contained"
-                >
-                  {getLabel("NEXT")}
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="text"
-                  onClick={onNextClick}
-                  disabled={COC?.isRequired || IDNumber}
-                >
-                  {getLabel("SKIP")}
-                </Button>
-              </Grid>
-            </Container>
-          </form>
-        </Box>
-      </Container>
-    </Box>
+    </Grid>
   );
+
+  const manualAddressFeilds = () => {
+    return (
+      <Box className={`manual-address ${isManual ? "" : "show-feilds"}`}>
+        {loqateService && <Divider />}
+        <Grid container spacing={1} rowGap={2}>
+          {formData.fields.map((item) => {
+            return item.value === "province" ? (
+              provinceRestricted?.includes(COR) ? (
+                showFeild(item)
+              ) : (
+                <></>
+              )
+            ) : (
+              showFeild(item)
+            );
+          })}
+        </Grid>
+      </Box>
+    );
+  };
+
+  if (formData) {
+    return (
+      <Box mt={4} className="search-address-card">
+        <form onSubmit={onNextClick}>
+          <Container sx={{ textAlign: "center" }} className="address-class">
+            <img src={`${imageFolder}${formData.headerIcon}`} alt="mailImg" />
+            <CardHeader title={getLabel(formData.header)} />
+            <CardSubHeader value={getLabel(formData.subHeader)} />
+            {loqateService ? (
+              <>
+                <FXCMAddressDropdown
+                  searchLabel={formData.inputLabel}
+                  selectedCountry={COR}
+                  displayManualFeilds={showManualAddressFeilds}
+                />
+                {manualAddressFeilds()}
+                {!isManual && (
+                  <Typography>
+                    <Button
+                      className="type-address"
+                      variant="text"
+                      onClick={showManualAddressFeilds}
+                    >
+                      {getLabel(formData.TextManual)}
+                    </Button>
+                  </Typography>
+                )}
+              </>
+            ) : (
+              manualAddressFeilds()
+            )}
+            <Button
+              disabled={false}
+              sx={{ m: 3 }}
+              type="submit"
+              variant="contained"
+            >
+              {getLabel("NEXT")}
+            </Button>
+          </Container>
+        </form>
+      </Box>
+    );
+  }
 };
 
-export default BasicIdentification;
+export default SearchAddress;
 
 
 
 
 
-
-
-
-//id number card
-.id-card-number {
-  .MuiFormControl-fullWidth {
-    width: 448px;
-    height: 40px;
+@mixin marginTop {
+  margin-top: 233px;
+  @media (max-width: 600px) {
+    margin-top: 109.29px;
   }
-  .MuiFormGroup-root {
-    gap: 8px;
+}
 
-    .radio-button {
-      display: flex;
-      padding: 16px;
-      gap: 8px;
-      width: 448px;
+@mixin textfieldWidth {
+  width: 448px;
+  @media (max-width: 600px) {
+    width: 312px;
+  }
+}
+
+@mixin searchaddresscard {
+  @media (max-width: 600px) {
+    width: 375px;
+    margin: 0 !important;
+    .heading-1 {
+      height: 31px !important;
+      width: 311px !important;
+    }
+    .subtext-cards {
+      height: 40px !important;
+      width: 311px !important;
+    }
+    .MuiAutocomplete-root {
+      width: 327px !important;
+      height: 40px !important;
+    }
+    .MuiTypography-root {
+      width: 327px !important;
+    }
+    .MuiButton-textPrimary {
+      width: 327px;
+      height: 19px;
+    }
+    .MuiButton-contained {
+      margin-top: 24px !important;
+      width: 327px !important;
+      height: 46px;
+      margin: auto;
+      margin-top: 50px !important;
+    }
+    .manual-address {
+      width: 327px !important;
+      // height: 384px;
+      .MuiDivider-root {
+        width: 321px !important;
+      }
+      .MuiGrid-root.MuiGrid-container {
+        width: 327px;
+        height: 280px;
+        .MuiGrid-item {
+          width: 327px;
+        }
+      }
+    }
+    .loqate-search-bar {
+      width: 327px !important;
       height: 56px;
-      border-radius: 90px;
-      box-sizing: border-box;
-      background: #f3f3f3;
-      label {
-        gap: 8px;
-        span {
-          height: 20px;
-          width: 20px;
-          span {
-            color: #d3d3d3;
-          }
-        }
-      }
-      p {
-        width: 356px;
-        height: 20px;
-        font-family: "Noto Sans";
-        font-size: 14px;
-        line-height: 20px;
-        letter-spacing: 0.03em;
-        color: rgba(0, 0, 0, 0.6);
-        display: flex;
+    }
+  }
+}
+
+.search-address-card {
+  @include searchaddresscard();
+  width: 920px;
+  margin-left: auto;
+  margin-right: auto;
+  .heading-1 {
+    display: flex;
+    justify-content: center;
+    width: 448px;
+    height: 45px;
+    font-family: "Noto Sans";
+    line-height: 45px;
+    letter-spacing: 0.03em;
+    margin: auto;
+  }
+  .Mui-disabled.Mui-error.MuiOutlinedInput-root {
+    background: #e6e6e6;
+  }
+  .MuiFormLabel-root.Mui-disabled.Mui-error {
+    color: #c4c4c4;
+  }
+  .show-feilds {
+    display: none;
+  }
+  .MuiFormHelperText-root {
+    margin: 4px 0px;
+    padding: 8px 12px;
+    width: 448px;
+    height: 56px;
+    background: #fdf0f2;
+    opacity: 0.8;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  .subtext-cards {
+    font-family: "Noto Sans";
+    height: 22px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    width: auto; //new
+  }
+  .loqate-search-bar {
+    width: 448px;
+    .MuiInputBase-root {
+      height: 40px;
+      .MuiInputBase-input {
+        font-size: 10px; // new
       }
     }
-    .selected-radio-button {
-      width: 448px;
-      box-sizing: border-box;
-      height: 116px;
-      background: #0071eb;
-      border: 1px solid #0071eb;
-      border-radius: 16px;
-      label {
-        height: 56px;
-        span.Mui-checked {
-          background: #ffffff;
-          border: 1px solid #d3d3d3;
-          height: 20px;
-          width: 20px;
-        }
-        p {
-          display: flex;
-          height: 20px;
-          width: 360px;
-          color: #ffffff;
-        }
+  }
+  .MuiTypography-root {
+    display: flex;
+    justify-content: center;
+  }
+  .type-address {
+    display: flex;
+    margin-top: 10px;
+  }
+  .MuiButton-contained {
+    margin-top: 36px;
+    width: 140px;
+  }
+  .manual-address {
+    width: 448px;
+    margin: auto;
+    margin-top: 24px;
+    .address-feild {
+      height: 40px;
+      .MuiTextField-root {
+        height: 40px;
       }
-      .id-card-input {
-        width: 416px;
-        height: 44px;
-        background: #ffffff;
-        border: 1px solid #d3d3d3;
-        border-radius: 4px;
-        box-sizing: border-box;
-        input {
-          padding: 10px 5px;
-        }
-        p {
-          top: 10px;
-          position: relative;
-        }
+      .MuiFormHelperText-root.Mui-error {
+        width: inherit;
+        padding: 0;
+        margin: 0;
+        margin-left: 2px;
       }
     }
+    .MuiDivider-root {
+      border: 1px solid #e5e5e5;
+      margin-bottom: 24px;
+      box-sizing: border-box;
+    }
+  }
+}
+
+.pcaautocomplete.pcatext {
+  width: 446px;
+  border-radius: 4px;
+  font-size: 10px;
+  margin-top: 5px;
+  @media (max-width: 600px) {
+    width: 327px;
   }
 }
 
@@ -298,532 +406,114 @@ export default BasicIdentification;
 
 
 
+import React, { useState, useEffect, useRef } from "react";
+import { TextField, InputAdornment } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import FXCMTrans from "../FXCMTrans";
+import { DEFAULT_OPTIONS } from "./Loqate.config";
+
+const FXCMLoqateSearchBar = ({
+	searchLabel,
+	selectedCountry,
+	displayManualFeilds,
+}) => {
+	const { t: getLabel } = useTranslation();
+	const [selectedAddress, setSelectedAddress] = useState("");
+	const [loqateError, setLoqateError] = useState(false);
+	const loqateControl = useRef();
+
+	const setupLoqate = () => {
+		const pca = window?.pca;
+		const handleAddressSelect = (address) => {
+			const addressString = address["Label"].split("\n").join(", ");
+			displayManualFeilds();
+			setSelectedAddress(addressString);
+		};
+
+		const handleLoqateError = () => {
+			setLoqateError(true);
+			displayManualFeilds();
+			setSelectedAddress("");
+		};
+
+		const Loqatefields = [
+			{ element: "fxcm-loqate-search", field: "" },
+			{
+				element: "flat_no",
+				field: "SubBuilding",
+				mode: pca.fieldMode.POPULATE,
+			},
+			{
+				element: "street_no",
+				field: "BuildingNumber",
+				mode: pca.fieldMode.POPULATE,
+			},
+			{ element: "street", field: "Street", mode: pca.fieldMode.POPULATE },
+			{ element: "city", field: "City", mode: pca.fieldMode.POPULATE },
+			{
+				element: "province",
+				field: "ProvinceName",
+				mode: pca.fieldMode.POPULATE,
+				PRESERVE: true,
+			},
+			{
+				element: "postal_code",
+				field: "PostalCode",
+				mode: pca.fieldMode.POPULATE,
+			},
+		];
+
+		const options = DEFAULT_OPTIONS(selectedCountry);
+
+		if (loqateControl.current) {
+			loqateControl.current.clear();
+			loqateControl.current.destroy();
+		}
+
+		loqateControl.current = new pca.Address(Loqatefields, options);
+		loqateControl.current.listen("populate", handleAddressSelect);
+		loqateControl.current.listen("error", handleLoqateError);
+		loqateControl.current.reload();
+	};
+
+	useEffect(() => {
+		setupLoqate();
+	}, [selectedCountry]);
+
+	return (
+		<TextField
+			className="loqate-search-bar"
+			id="fxcm-loqate-search"
+			label={getLabel(searchLabel)}
+			variant="outlined"
+			error={loqateError}
+			onChange={(e) => setSelectedAddress(e.target.value)}
+			value={selectedAddress}
+			size="small"
+			disabled={loqateError}
+			helperText={
+				loqateError ? (
+					<FXCMTrans defaults={getLabel("ADDRESS_SEARCH_ERROR")} />
+				) : (
+					""
+				)
+			}
+			InputProps={{
+				endAdornment: (
+					<InputAdornment>
+						<img
+							src={process.env.REACT_APP_CDN_URL + "/images/search-icon.svg"}
+							alt="Icon"
+						/>
+					</InputAdornment>
+				),
+			}}
+		/>
+	);
+};
+
+export default FXCMLoqateSearchBar;
 
 
 
 
-
-
-
-
-
-
-export const countriesId = [
-  {
-    country: "Austria",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 3,
-        max: 35,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Bulgaria",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 10,
-        max: 10,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Belgium",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 11,
-        max: 11,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Croatia",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 11,
-        max: 11,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Cyprus",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 7,
-        max: 7,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Czech Republic",
-    hasMuntipleIDs: true,
-    fields: [
-      {
-        min: 9,
-        max: 10,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "NATIONAL_IDENTITY_NUMBER",
-      },
-      {
-        min: 8,
-        max: 35,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Denmark",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 10,
-        max: 10,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Finland",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 11,
-        max: 11,
-        isAlphaNumeric: true,
-        symbolsAllowed: true,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "France",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 3,
-        max: 35,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Germany",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 3,
-        max: 35,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "NATIONAL_PASSPORT_NUMBER",
-        errorMsg: "Identity number input is incorrect",
-      },
-    ],
-  },
-  {
-    country: "Hungary",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 3,
-        max: 35,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Greece",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 10,
-        max: 10,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Ireland",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 3,
-        max: 35,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Latvia",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 11,
-        max: 12,
-        isAlphaNumeric: false,
-        symbolsAllowed: true,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Liechtenstein",
-    hasMuntipleIDs: true,
-    fields: [
-      {
-        min: 6,
-        max: 6,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "NATIONAL_IDENTITY_NUMBER",
-      },
-      {
-        min: 6,
-        max: 6,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Lithuania",
-    hasMuntipleIDs: true,
-    fields: [
-      {
-        min: 11,
-        max: 11,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "NATIONAL_IDENTITY_NUMBER",
-        errorMsg:"error"
-      },
-      {
-        min: 8,
-        max: 8,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-        errorMsg:"error"
-      },
-    ],
-  },
-  {
-    country: "Luxembourg",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 3,
-        max: 35,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Netherlands",
-    hasMuntipleIDs: true,
-    fields: [
-      {
-        min: 9,
-        max: 9,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "NATIONAL_IDENTITY_NUMBER",
-      },
-      {
-        min: 9,
-        max: 9,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Norway",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 11,
-        max: 11,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Portugal",
-    hasMuntipleIDs: true,
-    fields: [
-      {
-        min: 9,
-        max: 9,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "NATIONAL_IDENTITY_NUMBER",
-        errorMsg: "Identity number does not satisy",
-      },
-      {
-        min: 7,
-        max: 7,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-        errorMsg: "passport number does not satisy",
-      },
-    ],
-  },
-  {
-    country: "Romania",
-    hasMuntipleIDs: true,
-    fields: [
-      {
-        min: 13,
-        max: 13,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "NATIONAL_IDENTITY_NUMBER",
-      },
-      {
-        min: 8,
-        max: 8,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Slovakia",
-    hasMuntipleIDs: true,
-    fields: [
-      {
-        min: 10,
-        max: 10,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "NATIONAL_IDENTITY_NUMBER",
-      },
-      {
-        min: 9,
-        max: 9,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Slovenia",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 13,
-        max: 13,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Sweden",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 12,
-        max: 12,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "United Kingdom",
-    hasMuntipleIDs: false,
-    fields: [
-      {
-        min: 9,
-        max: 9,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Estonia",
-    hasMuntipleIDs: false,
-    isRequired: true,
-    fields: [
-      {
-        min: 11,
-        max: 11,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Iceland",
-    hasMuntipleIDs: false,
-    isRequired: true,
-    fields: [
-      {
-        min: 10,
-        max: 10,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Italy",
-    hasMuntipleIDs: false,
-    isRequired: true,
-    fields: [
-      {
-        min: 16,
-        max: 16,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Poland",
-    hasMuntipleIDs: true,
-    isRequired: true,
-    fields: [
-      {
-        min: 11,
-        max: 11,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "NATIONAL_IDENTITY_NUMBER",
-      },
-      {
-        min: 10,
-        max: 10,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Malta",
-    hasMuntipleIDs: true,
-    isRequired: true,
-    fields: [
-      {
-        min: 8,
-        max: 8,
-        isAlphaNumeric: true,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "NATIONAL_IDENTITY_NUMBER",
-      },
-      {
-        min: 7,
-        max: 7,
-        isAlphaNumeric: false,
-        symbolsAllowed: false,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-  {
-    country: "Spain",
-    hasMuntipleIDs: false,
-    isRequired: true,
-    fields: [
-      {
-        min: 9,
-        max: 9,
-        isAlphaNumeric: true,
-        symbolsAllowed: true,
-        helpText: "some help text",
-        value: "PASSPORT_NUMBER",
-      },
-    ],
-  },
-];
