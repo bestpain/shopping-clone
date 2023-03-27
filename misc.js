@@ -594,3 +594,45 @@ body,
 
 
 
+
+{
+  "sectionName": "formofID",
+  "sectionKey": 1,
+  "cards": [
+    {
+      "type": "basicIdentification",
+      "cardKey": 0,
+      "headerIcon": "BUSSINESS_ICON",
+      "header": "PROVIDE_ID",
+      "subHeader": "GOVERNMENT_ID",
+      "skipText": "",
+      "fields1": [
+        {
+          "label": "National ID Number",
+          "value": "NATIONAL_IDENTITY_NUMBER",
+          "required": false,
+          "column": 12,
+          "type": "radio"
+        },
+        {
+          "label": "NATIONAL PASSPORT",
+          "value": "PASSPORT_NUMBER",
+          "required": false,
+          "column": 12,
+          "type": "radio"
+        }
+      ],
+      "fields2": [
+        {
+          "label": "NATIONAL PASSPORT",
+          "value": "NATIONAL_PASSPORT_NUMBER",
+          "required": true,
+          "column": 12,
+          "type": "text"
+        }
+      ]
+    }
+  ]
+}
+
+
