@@ -1,4 +1,188 @@
-  {
+{
+  "sections": [
+    {
+      "sectionName": "aboutYourself",
+      "sectionKey": 0
+    },
+    {
+      "sectionName": "formofID",
+      "sectionKey": 1
+    },
+    {
+      "sectionName": "addressContact",
+      "sectionKey": 2
+    },
+    {
+      "sectionName": "employmentInfo",
+      "sectionKey": 3
+    },
+    {
+      "sectionName": "financialInfo",
+      "sectionKey": 4
+    },
+    {
+      "sectionName": "tradingInfo",
+      "sectionKey": 5
+    }
+  ]
+}
+
+
+
+
+
+
+{
+  "sectionName": "aboutYourself",
+  "sectionKey": 0,
+  "cards": [
+    {
+      "type": "aboutYourself",
+      "cardKey": 0,
+      "headerIcon": "ABOUTYOURSELF_ICON",
+      "header": "ABOUT_YOURSELF_HEADER",
+      "subHeader": "ABOUT_YOURSELF_SUBHEADER",
+      "fields": [
+        {
+          "label": "firstName",
+          "value": "firstName",
+          "required": true,
+          "column": 6,
+          "type": "text",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        {
+          "label": "middleName",
+          "value": "middleName",
+          "required": false,
+          "column": 6,
+          "type": "text",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        {
+          "label": "lastName",
+          "value": "lastName",
+          "required": true,
+          "column": 12,
+          "type": "text",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        {
+          "label": "dob",
+          "value": "dob",
+          "required": true,
+          "column": 12,
+          "type": "AgeDatePicker",
+          "minAge": 18,
+          "maxAge": 100
+        },
+        {
+          "label": "gender",
+          "value": "gender",
+          "column": 12,
+          "type": "radio",
+          "options": [
+            {
+              "label": "MALE",
+              "value": "M"
+            },
+            {
+              "label": "FEMALE",
+              "value": "F"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "question",
+      "cardKey": 0,
+      "headerIcon": "QUESTIONNAIRE_ICON",
+      "header": "CITIZENSHIP_COUNTRY",
+      "subHeader": "",
+      "isMultiSelect": false,
+      "skipText": "",
+      "optionWidth": "short",
+      "dependency": [
+        {
+          "sectionKey": 5,
+          "cardKey": 3,
+          "value": true
+        }
+      ],
+      "options": [
+        {
+          "label": "YES",
+          "value": true
+        },
+        {
+          "label": "NO",
+          "value": false
+        }
+      ]
+    },
+    {
+      "type": "citizenship",
+      "cardKey": 1,
+      "headerIcon": "CITIZENSHIPPLACEBIRTH_ICON",
+      "header": "CITIZENSHIP_BIRTH_PLACE",
+      "subHeader": "CITIZENSHIP_BIRTH_PLACE_SUBHEADER",
+      "isMultiSelect": false,
+      "skipText": "",
+      "isChecked": true,
+      "checkLabel": "MY_PLACE_OF_BIRTH",
+      "dependency": [
+        {
+          "sectionKey": 5,
+          "cardKey": 3,
+          "isChecked": true
+        }
+      ]
+    },
+    {
+      "type": "placeOfBirth",
+      "cardKey": 2,
+      "headerIcon": "CITIZENSHIPPLACEBIRTH_ICON",
+      "header": "PLACE_OF_BIRTH_TITLE",
+      "subHeader": "PLACE_OF_BIRTH_TITLE_SUBHEADER",
+      "isMultiSelect": false,
+      "skipText": ""
+    },
+    {
+      "type": "question",
+      "cardKey": 1,
+      "headerIcon": "POLITICALLYEXPOSEDPERSON_ICON",
+      "header": "politicallyExposedPerson",
+      "subHeader": "POLITICALLY_EXPOSED_PERSON_SUBHEADER",
+      "isMultiSelect": false,
+      "optionWidth": "short",
+      "options": [
+        {
+          "label": "YES",
+          "value": true
+        },
+        {
+          "label": "NO",
+          "value": false
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+
+{
+  "sectionName": "addressContact",
+  "sectionKey": 6,
+  "cards": [
+    {
       "type": "searchAddress",
       "cardKey": 0,
       "headerIcon": "home.png",
@@ -18,501 +202,394 @@
         {
           "label": "Building/Street Number",
           "value": "street_no",
-          "required": false,
+          "required": true,
           "column": 6,
           "type": "text"
         },
         {
           "label": "Street name",
           "value": "street",
-          "required": false,
-          "column": 6,
+          "required": true,
+          "column": 12,
           "type": "text"
         },
         {
           "label": "City / Town",
           "value": "city",
-          "required": false,
+          "required": true,
           "column": 6,
           "type": "text"
         },
         {
           "label": "Province",
           "value": "province",
-          "required": false,
+          "required": true,
           "column": 7,
           "type": "text"
         },
         {
           "label": "Postcode",
           "value": "postal_code",
-          "required": false,
+          "required": true,
           "column": 5,
           "type": "text"
         }
       ]
     },
-      
-      
-      
-      
-      
-      
-      
-      import {
-  Button,
-  Container,
+    {
+      "type": "contactnumber",
+      "order": 1,
+      "headerIcon": "phone.png",
+      "header": "WHAT_IS_YOUR_CONTACT",
+      "subHeader": "WHAT_IS_YOUR_CONTACT_SUBHEADER",
+      "inputLabel": "SEARCH_ADDRESS",
+      "TextManual": "ENTER_MANUALLY",
+      "skipText": "",
+      "fields": [
+        {
+          "label": "CONTACT_NUMBER",
+          "value": "CONTACT_NUMBER",
+          "required": true,
+          "column": 8,
+          "type": "number"
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+
+import {
   Typography,
-  Box,
-  Grid,
-  FormControl,
-  TextField,
-  Divider,
+  Stepper,
+  Step,
+  StepLabel,
+  styled,
+  StepButton,
 } from "@mui/material";
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";
-import CardHeader from "../../../CardHeader";
-import CardSubHeader from "../../../CardSubHeader";
-import FXCMAddressDropdown from "../../../common/FXCMLoqateSearchBar";
+import StepConnector, {
+  stepConnectorClasses,
+} from "@mui/material/StepConnector";
+import PropTypes from "prop-types";
 import "./style.scss";
-import { imageFolder } from "../../../../constants/ImageConstants";
-import { restrictedCountriesURL } from "../../../../constants/configurationServices";
-import FXCMTrans from "../../../common/FXCMTrans";
+import { useTranslation } from "react-i18next";
+import { optionIconFolder } from "../../../constants/ImageConstants";
 
-const SearchAddress = ({ formData, nextClick: parentNext }) => {
+export const StepperComponent = ({
+  skippedSections,
+  steps,
+  activeSection,
+  completed,
+  handleStep,
+}) => {
   const { t: getLabel } = useTranslation();
-  const [loqateService, setLoqateService] = useState(true);
-  const [isManual, setIsManual] = useState(false);
-  const [restrictedLoqate, setRestrictedLoqate] = useState();
-  const [provinceRestricted, setProvinceRestricted] = useState();
-  const [errorFeild, setErrorFeild] = useState([]);
-  const COR = useSelector((state) => state.user.user.countryOfResidence);
+  const isMobile = window.innerWidth < 600;
+  const mobileSteps = activeSection
+    ? [activeSection - 1, activeSection + 2]
+    : [0, 3];
 
-  const fetchLoqateRestrictedcountries = () => {
-    fetch(restrictedCountriesURL)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setRestrictedLoqate(data.loqateRestricted);
-        setProvinceRestricted(data.provinceRestricted);
-      })
-      .catch((e) => {
-        console.log(e.message);
-      });
-  };
-
-  useEffect(() => {
-    fetchLoqateRestrictedcountries();
-  }, []);
-
-  useEffect(() => {
-    if (restrictedLoqate?.includes(COR)) {
-      setLoqateService(false);
-      setIsManual(true);
-    }
-  }, [restrictedLoqate, COR]);
-
-  const showManualAddressFeilds = () => {
-    setIsManual(true);
-  };
-
-  const onNextClick = (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    const formJson = Object.fromEntries(formData.entries());
-    const errorFeilds = [];
-    for (let key in formJson) {
-      if (formJson[key] === "" && key !== "flat_no") errorFeilds.push(key);
-    }
-    setErrorFeild(errorFeilds);
-    if (parentNext && !errorFeilds.length) {
-      parentNext();
-      console.log(formJson);
-    }
-  };
-
-  const getFeildSize = (item) => {
-    if (!provinceRestricted?.includes(COR)) {
-      if (item.value === "street") return 12;
-      if (item.value === "city") return 7;
-    }
-    return item.column;
-  };
-
-  const showFeild = (item) => (
-    <Grid item md={getFeildSize(item)} key={item.value}>
-      <FormControl className="custom-form-controler address-feild" fullWidth>
-        <TextField
-          required={item.required}
-          placeholder={getLabel(item.label)}
-          type={item.type}
-          variant="outlined"
-          id={item.value}
-          name={item.value}
-          onChange={() => {
-            if (errorFeild.length) setErrorFeild([]);
-          }}
-          error={errorFeild.includes(item.value)}
-          helperText={
-            errorFeild.includes(item.value) ? (
-              <FXCMTrans defaults={getLabel("MANDATORY_CHECK")} />
-            ) : (
-              ""
-            )
-          }
-        />
-      </FormControl>
-    </Grid>
-  );
-
-  const manualAddressFeilds = () => {
-    return (
-      <Box className={`manual-address ${isManual ? "" : "show-feilds"}`}>
-        {loqateService && <Divider />}
-        <Grid container spacing={1} rowGap={2}>
-          {formData.fields.map((item) => {
-            return item.value === "province" ? (
-              provinceRestricted?.includes(COR) ? (
-                showFeild(item)
-              ) : (
-                <></>
-              )
-            ) : (
-              showFeild(item)
+  return (
+    <>
+      {isMobile ? (
+        <Stepper
+          className="customSteperStyle"
+          activeStep={activeSection < 2 ? activeSection : 1}
+        >
+          {steps.slice(...mobileSteps).map((stepData) => {
+            const isSkipped = skippedSections?.includes(stepData.sectionName);
+            return (
+              <Step
+                key={stepData.sectionName}
+                component={() => (
+                  <StepLabel className={isSkipped ? "skipped-section" : ""}>
+                    <p>
+                      {activeSection === stepData.sectionKey
+                        ? `${stepData.sectionKey + 1} / ${steps.length}` 
+                        : ""}
+                    </p>
+                    <p>{getLabel(stepData.sectionName)}</p>
+                    {isSkipped && (
+                      <img
+                        src={optionIconFolder + "skip_next" + ".svg"}
+                        alt="Icon"
+                      />
+                    )}
+                  </StepLabel>
+                )}
+              ></Step>
             );
           })}
-        </Grid>
-      </Box>
-    );
-  };
-
-  if (formData) {
-    return (
-      <Box mt={4} className="search-address-card">
-        <form onSubmit={onNextClick}>
-          <Container sx={{ textAlign: "center" }} className="address-class">
-            <img src={`${imageFolder}${formData.headerIcon}`} alt="mailImg" />
-            <CardHeader title={getLabel(formData.header)} />
-            <CardSubHeader value={getLabel(formData.subHeader)} />
-            {loqateService ? (
-              <>
-                <FXCMAddressDropdown
-                  searchLabel={formData.inputLabel}
-                  selectedCountry={COR}
-                  displayManualFeilds={showManualAddressFeilds}
-                />
-                {manualAddressFeilds()}
-                {!isManual && (
-                  <Typography>
-                    <Button
-                      className="type-address"
-                      variant="text"
-                      onClick={showManualAddressFeilds}
-                    >
-                      {getLabel(formData.TextManual)}
-                    </Button>
-                  </Typography>
+        </Stepper>
+      ) : (
+        <Stepper className="customSteperStyle" activeStep={activeSection}>
+          {steps.map((stepData) => {
+            const isSkipped = skippedSections?.includes(stepData.sectionName);
+            return (
+              <Step
+                key={stepData.sectionName}
+                component={() => (
+                  <StepLabel className={isSkipped ? "skipped-section" : ""}>
+                    <p>
+                      {activeSection === stepData.sectionKey
+                        ? `${stepData.sectionKey + 1} / ${steps.length}` 
+                        : ""}
+                    </p>
+                    <p>&nbsp;{getLabel(stepData.sectionName)}</p>
+                    {isSkipped && (
+                      <img
+                        src={optionIconFolder + "skip_next" + ".svg"}
+                        alt="Icon"
+                      />
+                    )}
+                  </StepLabel>
                 )}
-              </>
-            ) : (
-              manualAddressFeilds()
-            )}
-            <Button
-              disabled={false}
-              sx={{ m: 3 }}
-              type="submit"
-              variant="contained"
-            >
-              {getLabel("NEXT")}
-            </Button>
-          </Container>
-        </form>
-      </Box>
-    );
-  }
+              ></Step>
+            );
+          })}
+        </Stepper>
+      )}
+    </>
+  );
 };
 
-export default SearchAddress;
 
 
 
 
 
-@mixin marginTop {
-  margin-top: 233px;
+
+// @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap");
+
+@import "../src/assets/scss/ColorVariable.scss";
+@import "../src/assets/scss/mixin.scss";
+
+@import "../src/assets/scss/Typography.scss";
+@import "../src/assets/scss/Button.scss";
+@import "../src/assets/scss/Link.scss";
+// @import "../src/assets/scss/Dropdown.scss";
+@import "../src/assets/scss/Checkbox.scss";
+@import "../src/assets/scss/TextField.scss";
+@import "../src/components/CardSubHeader/style.scss";
+
+body,
+* {
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+// media
+@mixin marginHeader {
+  margin-top: 20px;
   @media (max-width: 600px) {
-    margin-top: 109.29px;
+    margin-top: 76px;
   }
 }
 
-@mixin textfieldWidth {
-  width: 448px;
+@mixin bodyWrapperPadding {
+  padding-top: 130px;
+}
+
+@mixin responsiveWidth {
+  width: 460px;
   @media (max-width: 600px) {
-    width: 312px;
+    width: 343px;
   }
 }
 
-@mixin searchaddresscard {
-  @media (max-width: 600px) {
-    width: 375px;
-    margin: 0 !important;
-    .heading-1 {
-      height: 31px !important;
-      width: 311px !important;
-    }
-    .subtext-cards {
-      height: 40px !important;
-      width: 311px !important;
-    }
-    .MuiAutocomplete-root {
-      width: 327px !important;
-      height: 40px !important;
-    }
-    .MuiTypography-root {
-      width: 327px !important;
-    }
-    .MuiButton-textPrimary {
-      width: 327px;
-      height: 19px;
-    }
-    .MuiButton-contained {
-      margin-top: 24px !important;
-      width: 327px !important;
-      height: 46px;
-      margin: auto;
-      margin-top: 50px !important;
-    }
-    .manual-address {
-      width: 327px !important;
-      // height: 384px;
-      .MuiDivider-root {
-        width: 321px !important;
-      }
-      .MuiGrid-root.MuiGrid-container {
-        width: 327px;
-        height: 280px;
-        .MuiGrid-item {
-          width: 327px;
-        }
-      }
-    }
-    .loqate-search-bar {
-      width: 327px !important;
-      height: 56px;
+.body-wrapper {
+  @include bodyWrapperPadding;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.container-home {
+  @include responsiveWidth;
+  margin: 0 auto;
+  padding: 0 15px;
+  .MuiGrid-container {
+    .MuiGrid-item {
+      padding-top: 0;
     }
   }
 }
 
-.search-address-card {
-  @include searchaddresscard();
-  width: 920px;
-  margin-left: auto;
-  margin-right: auto;
-  .heading-1 {
+.button-text {
+  &.MuiButton-root {
+    &.MuiButton-text {
+      color: $primary;
+      text-transform: capitalize;
+      background: transparent !important;
+      border-radius: 30px;
+    }
+  }
+}
+.white-outline-button {
+  &.MuiButton-root {
+    &.MuiButton-text {
+      color: $primary;
+      text-transform: capitalize;
+      background: transparent !important;
+      border: 2px solid #f0f0f0;
+    }
+  }
+}
+
+.flag-img {
+  width: 20px;
+  margin-right: 10px;
+}
+
+.custom-select-dropdown {
+  .MuiMenu-list {
+    max-height: 300px;
+    max-width: 500px;
+  }
+}
+
+.sub-text {
+  &.MuiTypography-root {
+    color: rgba($black, 0.68);
+    font-size: 11px;
+  }
+}
+
+.link-text {
+  &.MuiTypography-root {
+    color: $primary;
+    font-size: 12px;
+    cursor: pointer;
+  }
+}
+
+.chat-button {
+  &.MuiButton-root {
     display: flex;
-    justify-content: center;
-    width: 448px;
-    height: 45px;
-    font-family: "Noto Sans";
-    line-height: 45px;
-    letter-spacing: 0.03em;
-    margin: auto;
+    flex-direction: column;
+    text-transform: none;
+    box-shadow: 0px 3px 16px 2px rgb(0 0 0 / 12%);
+    border-radius: 100px;
+    width: 80px;
+    height: 80px;
+
+    p {
+      font-size: 10px;
+    }
   }
-  .Mui-disabled.Mui-error.MuiOutlinedInput-root {
-    background: #e6e6e6;
+}
+.heading-title {
+  &.MuiTypography-h5 {
+    font-size: 36px;
+    font-weight: 300;
+    @include forPhoneOnly {
+      font-size: 28px;
+    }
   }
-  .MuiFormLabel-root.Mui-disabled.Mui-error {
-    color: #c4c4c4;
-  }
-  .show-feilds {
+}
+.stepper-box-wrapper {
+  // position: fixed;
+  // width: 100%;
+  // position: sticky;
+  // top: 0;
+  padding: 0 !important;
+  // background: #0071eb;
+  .hide-step {
     display: none;
   }
-  .MuiFormHelperText-root {
-    margin: 4px 0px;
-    padding: 8px 12px;
-    width: 448px;
-    height: 56px;
-    background: #fdf0f2;
-    opacity: 0.8;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  .subtext-cards {
-    font-family: "Noto Sans";
-    height: 22px;
-    margin: 0 auto;
-    margin-bottom: 20px;
-    width: auto; //new
-  }
-  .loqate-search-bar {
-    width: 448px;
-    .MuiInputBase-root {
-      height: 40px;
-      .MuiInputBase-input {
-        font-size: 10px; // new
-      }
+  .skipped-section {
+    background: #dda034 !important;
+    border-radius: 32px !important;
+    .MuiStepLabel-label {
+      color: #ffffff !important;
     }
   }
-  .MuiTypography-root {
+  .MuiStepLabel-iconContainer {
+    display: none;
+  }
+  .MuiStepLabel-root {
+    padding: 2px 20px 2px 20px;
+    width: 240px;
+    height: 28px;
+    background: #0071eb;
+    border-radius: 0px 32px 32px 0px;
+  }
+  .Mui-completed {
+    color: #97c6f7 !important;
+  }
+  .MuiStepLabel-root:has(> .Mui-completed) {
+    background: #0071eb;
+    border-radius: 0px;
+  }
+  .Mui-disabled {
+    background: #f3f3f3;
+    border-radius: 0px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+  .MuiStepLabel-label {
+    font-weight: 700 !important;
+    // margin: 0 !important;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
+    height: 28px;
+    align-items: center;
   }
-  .type-address {
-    display: flex;
-    margin-top: 10px;
-  }
-  .MuiButton-contained {
-    margin-top: 36px;
-    width: 140px;
-  }
-  .manual-address {
-    width: 448px;
-    margin: auto;
-    margin-top: 24px;
-    .address-feild {
-      height: 40px;
-      .MuiTextField-root {
-        height: 40px;
-      }
-      .MuiFormHelperText-root.Mui-error {
-        width: inherit;
-        padding: 0;
-        margin: 0;
-        margin-left: 2px;
-      }
-    }
-    .MuiDivider-root {
-      border: 1px solid #e5e5e5;
-      margin-bottom: 24px;
-      box-sizing: border-box;
-    }
+  .Mui-active {
+    color: #ffffff !important;
   }
 }
 
-.pcaautocomplete.pcatext {
-  width: 446px;
+.font-14 {
+  font-size: 14px;
+}
+.error_text {
+  color: #f44336;
+  text-align: center;
+  font-size: 12px;
+  margin-top: 10px;
+}
+.align_center {
+  text-align: center;
+}
+.password-validation-wrapper {
+  background: $lightRed;
   border-radius: 4px;
-  font-size: 10px;
-  margin-top: 5px;
-  @media (max-width: 600px) {
-    width: 327px;
+  text-align: initial;
+  .MuiTypography-root {
+    color: $red;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  ul {
+    padding-left: 18px;
+    margin: 0;
+    li {
+      font-size: 12px;
+      font-weight: 500;
+      color: #524f4b;
+      line-height: 1.7;
+      list-style-image: initial;
+      &.default {
+        color: #524f4b;
+        list-style-image: initial;
+      }
+      &.greenTick {
+        color: #20c374;
+        list-style-image: url(../public/images/Vector.svg);
+      }
+      &.redCross {
+        color: #f44336;
+        list-style-image: url(../public/images/crossIcon.svg);
+      }
+    }
   }
 }
-
-
-
-
-
-import React, { useState, useEffect, useRef } from "react";
-import { TextField, InputAdornment } from "@mui/material";
-import { useTranslation } from "react-i18next";
-import FXCMTrans from "../FXCMTrans";
-import { DEFAULT_OPTIONS } from "./Loqate.config";
-
-const FXCMLoqateSearchBar = ({
-	searchLabel,
-	selectedCountry,
-	displayManualFeilds,
-}) => {
-	const { t: getLabel } = useTranslation();
-	const [selectedAddress, setSelectedAddress] = useState("");
-	const [loqateError, setLoqateError] = useState(false);
-	const loqateControl = useRef();
-
-	const setupLoqate = () => {
-		const pca = window?.pca;
-		const handleAddressSelect = (address) => {
-			const addressString = address["Label"].split("\n").join(", ");
-			displayManualFeilds();
-			setSelectedAddress(addressString);
-		};
-
-		const handleLoqateError = () => {
-			setLoqateError(true);
-			displayManualFeilds();
-			setSelectedAddress("");
-		};
-
-		const Loqatefields = [
-			{ element: "fxcm-loqate-search", field: "" },
-			{
-				element: "flat_no",
-				field: "SubBuilding",
-				mode: pca.fieldMode.POPULATE,
-			},
-			{
-				element: "street_no",
-				field: "BuildingNumber",
-				mode: pca.fieldMode.POPULATE,
-			},
-			{ element: "street", field: "Street", mode: pca.fieldMode.POPULATE },
-			{ element: "city", field: "City", mode: pca.fieldMode.POPULATE },
-			{
-				element: "province",
-				field: "ProvinceName",
-				mode: pca.fieldMode.POPULATE,
-				PRESERVE: true,
-			},
-			{
-				element: "postal_code",
-				field: "PostalCode",
-				mode: pca.fieldMode.POPULATE,
-			},
-		];
-
-		const options = DEFAULT_OPTIONS(selectedCountry);
-
-		if (loqateControl.current) {
-			loqateControl.current.clear();
-			loqateControl.current.destroy();
-		}
-
-		loqateControl.current = new pca.Address(Loqatefields, options);
-		loqateControl.current.listen("populate", handleAddressSelect);
-		loqateControl.current.listen("error", handleLoqateError);
-		loqateControl.current.reload();
-	};
-
-	useEffect(() => {
-		setupLoqate();
-	}, [selectedCountry]);
-
-	return (
-		<TextField
-			className="loqate-search-bar"
-			id="fxcm-loqate-search"
-			label={getLabel(searchLabel)}
-			variant="outlined"
-			error={loqateError}
-			onChange={(e) => setSelectedAddress(e.target.value)}
-			value={selectedAddress}
-			size="small"
-			disabled={loqateError}
-			helperText={
-				loqateError ? (
-					<FXCMTrans defaults={getLabel("ADDRESS_SEARCH_ERROR")} />
-				) : (
-					""
-				)
-			}
-			InputProps={{
-				endAdornment: (
-					<InputAdornment>
-						<img
-							src={process.env.REACT_APP_CDN_URL + "/images/search-icon.svg"}
-							alt="Icon"
-						/>
-					</InputAdornment>
-				),
-			}}
-		/>
-	);
-};
-
-export default FXCMLoqateSearchBar;
 
 
 
