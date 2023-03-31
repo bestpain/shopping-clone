@@ -1,70 +1,79 @@
-.customSteperMobileStyle {
-  width: 100%;
-  span {
-    height: 23px !important;
-  }
-  .MuiStepLabel-root {
-    padding: 2px 12px !important;
-    width: inherit;
-  }
-  .MuiStepLabel-labelContainer {
-    width: max-content;
-    // width: 100%;
-  }
-  .MuiStepLabel-label {
-    display: flex;
-    align-items: center;
-  }
-}
+import {
+  Typography,
+  Stepper,
+  Step,
+  StepLabel,
+  styled,
+  StepButton,
+} from "@mui/material";
+import StepConnector, {
+  stepConnectorClasses,
+} from "@mui/material/StepConnector";
+import PropTypes from "prop-types";
+import "./style.scss";
+import { useTranslation } from "react-i18next";
+import { optionIconFolder } from "../../../constants/ImageConstants";
 
-.stepper-box-wrapper {
-  // @include Stepper-Mobile;
-  // position: fixed;
-  // width: 100%;
-  // position: sticky;
-  // top: 0;
-  padding: 0 !important;
+const getMobileLabelName = (label) => {
+  if (label === "addressContact") return "Contact";
+  if (label === "financialInfo") return "Finances";
+  return label;
+};
 
-  .MuiStepConnector-root {
-    display: none;
-  }
-  .skipped-section {
-    background: #dda034 !important;
-    border-radius: 32px !important;
-    .MuiStepLabel-label {
-      // color: #ffffff !important;
-    }
-  }
-  .MuiStepLabel-iconContainer {
-    display: none;
-  }
-  .MuiStepLabel-root {
-    padding:  2px 20px 2px 20px;
-    width: 240px;
-    height: 28px;
-    background: #0071eb;
-    border-radius: 0px 32px 32px 0px;
-  }
-  .Mui-completed {
-    color: #97c6f7 !important;
-  }
-  .MuiStepLabel-root:has(> .Mui-completed) {
-    background: #0071eb;
-    border-radius: 0px;
-  }
-  .Mui-disabled {
-    background: #f3f3f3;
-    border-radius: 0px;
-    color: rgba(0, 0, 0, 0.6);
-  }
-  .MuiStepLabel-label {
-    font-weight: 700 !important;
-    display: flex;
-    justify-content: space-around;
-    height: 28px;
-    align-items: center;
-  }
-  .Mui-active {
-    color: #ffffff !important;
-  }
-}
+export const StepperComponent = ({ skippedSections, steps, activeSection }) => {
+  const { t: getLabel } = useTranslation();
+  const isMobile = window.innerWidth < 600;
+  const isLastStep = activeSection === steps.length - 1;
+  const mobileSteps = activeSection
+    ? !isLastStep
+      ? [activeSection - 1, activeSection + 2]
+      : [activeSection - 2, activeSection + 1]
+    : [0, 3];
+
+  const getProgressBar = (stepData) => {
+    const isSkipped = skippedSections?.includes(stepData.sectionName);
+    return (
+      <Step
+        key={stepData.sectionName}
+        component={() => (
+          <StepLabel className={isSkipped ? "skipped-section" : ""}>
+            <p>
+              {activeSection === stepData.sectionKey
+                ? `${stepData.sectionKey + 1} / ${steps.length}`
+                : ""}
+            </p>
+            <p>
+              {isMobile ? (
+                <>&nbsp;{getLabel(getMobileLabelName(stepData.sectionName))}</>
+              ) : (
+                getLabel(stepData.sectionName)
+              )}
+            </p>
+            {isSkipped && (
+              <img src={optionIconFolder + "skip_next" + ".svg"} alt="Icon" />
+            )}
+          </StepLabel>
+        )}
+      ></Step>
+    );
+  };
+
+  return (
+    <>
+      {isMobile ? (
+        <Stepper
+          className="customSteperMobileStyle"
+          activeStep={activeSection < 2 ? activeSection : isLastStep ? 2 : 1}
+        >
+          {steps
+            .slice(...mobileSteps)
+            .map((stepData) => getProgressBar(stepData))}
+        </Stepper>
+      ) : (
+        <Stepper className="customSteperStyle" activeStep={activeSection}>
+          {steps.map((stepData) => getProgressBar(stepData))}
+        </Stepper>
+      )}
+    </>
+  );
+};
